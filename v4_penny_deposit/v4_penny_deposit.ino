@@ -141,6 +141,26 @@ void readEncoderY() {
   pos = (360 * turn) + angle;
 } */
 
+/*void circle(float radius, int circlenum) {
+  for(int i = 0; i <= circlenum; i++) {
+    receivedChar = Serial.read();
+    if (receivedChar == 'z') {
+      break;
+    }
+    Serial.print("CIRCLESTUFF: ");
+    Serial.print(i);
+    Serial.print(", ");
+    Serial.println((radius * sin(i * (2*PI/circlenum))));
+    float newxpos = 445 - (radius * cos(i * (2*PI/circlenum)));
+    int newx = round(newxpos);
+    float newypos = 464 - (radius * sin(i * (2*PI/circlenum)));
+    int newy = round(newypos);
+    stepMove(newx, newy);
+    delay(20);
+  } 
+}
+*/
+
 void loop() {
   // put your main code here, to run repeatedly:
 
