@@ -14,14 +14,10 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 uint8_t servonum = 0;
 int potpin = 0;  // analog pin used to connect the potentiometer
-int val1, val2;
-int count1 = 0;
-int count2 = 0;
-double pulsex = 450;
-double pulsey = 500; 
 int buttonState = 0;  
 int servo0Pos;
 int servo1Pos;
+int servo2Pos;
 int MOVEDELAY = 20;
 int DISPENSEDELAY = 3;
 
@@ -37,9 +33,11 @@ void setup() {
   yield();
 }
 
-void moveServos(int pos0, int pos1, bool first0) {
+void moveServos(int pos0, int pos1, int pos2) {
   int dir0;
   int dir1;
+  int dir2; 
+  
   if(servo0Pos < pos0) {
     dir0 = 1;
   } else {
@@ -50,29 +48,27 @@ void moveServos(int pos0, int pos1, bool first0) {
   } else {
     dir1 = -1;
   }
-
-  if(first0) {
-    while(servo0Pos != pos0) {
-      servo0Pos+=dir0;
-      pwm.setPWM(0, 0, servo0Pos);
-      delay(10);
-    }
-    while(servo1Pos != pos1) {
-      servo1Pos+=dir1;
-      pwm.setPWM(1, 0, servo0Pos);
-      delay(10);
-    }
+  if(servo2Pos < pos2) {
+    dir2 = 1;
   } else {
-    while(servo1Pos != pos1) {
-      servo1Pos+=dir1;
-      pwm.setPWM(1, 0, servo0Pos);
-      delay(10);
-    }
-    while(servo0Pos != pos0) {
-      servo0Pos+=dir0;
-      pwm.setPWM(0, 0, servo0Pos);
-      delay(10);
-    }
+    dir2 = -1;
+  }
+  
+  
+  while(servo0Pos != pos0) {
+    servo0Pos+=dir0;
+    pwm.setPWM(0, 0, servo0Pos);
+    delay(10);
+  }
+  while(servo1Pos != pos1) {
+    servo1Pos+=dir1;
+    pwm.setPWM(1, 0, servo1Pos);
+    delay(10);
+  }
+  while(servo2Pos != pos2) {
+    servo2Pos+=dir2;
+    pwm.setPWM(2, 0, servo2Pos);
+    delay(10);
   }
 }
 
