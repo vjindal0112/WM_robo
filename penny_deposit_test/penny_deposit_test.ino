@@ -182,12 +182,31 @@ void circle(float radius, int circlenum) {
 void loop() {
   // put your main code here, to run repeatedly:
   if(Serial.available() > 0) {
-    zero();
-      
-    moveX(370);
-    moveY(370);
-  
-    delay(2000000);
+    receivedChar = Serial.read();
+    if(receivedChar == 'w') {
+      moveX(xpos + 10);
+    }
+    if(receivedChar == 's') {
+      moveX(xpos - 10);
+    }
+    if(receivedChar == 'a') {
+      moveY(ypos + 10);
+    }
+    if(receivedChar == 'd') {
+      moveY(ypos - 10);
+    }
+    if(receivedChar == 't') {
+      moveX(xpos + 1);
+    }
+    if(receivedChar == 'g') {
+      moveX(xpos - 10);
+    }
+    if(receivedChar == 'f') {
+      moveY(ypos + 1);
+    }
+    if(receivedChar == 'h') {
+      moveY(ypos - 1);
+    }
   }
 
 
