@@ -85,7 +85,6 @@ void clawClosed() {
 }
 
 void toDropHeight() {
-  
 }
 
 void toPickUpHeight() {
