@@ -36,8 +36,8 @@ void setup() {
   encoderY.begin();
 
   // Use these functions to set the direction that the encoder reads in
-  encoderX.setClockWise(false);
-  encoderY.setClockWise(false);
+  encoderX.setClockWise(true);
+  encoderY.setClockWise(true);
 
   stepperX.setSpeed(40);
   stepperY.setSpeed(40);
@@ -112,6 +112,9 @@ void zero() {
   
   encoderX.setZeroReg();
   encoderY.setZeroReg();
+  
+  xpos = encoderX.angleR(U_DEG);
+  ypos = encoderY.angleR(U_DEG);
 }
 
 void readEncoderX() {
@@ -123,27 +126,35 @@ void readEncoderX() {
     turnX--;  
   }
   xpos = (360 * turnX) + angleX;
-  archiveAngleX = angleX;
+  if(archiveAngleX != angleX) {
+    archiveAngleX = angleX;
+  }
   Serial.print("X POS: ");
   Serial.print(turnX);
   Serial.print(", ");
-  Serial.println(angleX);
+  Serial.print(angleX);
+  Serial.print(", ");
+  Serial.println(xpos);
 }
 
 void readEncoderY() {
   angleY = encoderY.angleR(U_DEG);
   if(angleY > 0 && angleY < 100 && archiveAngleY > 260 && archiveAngleY < 360) {
-    turnY--;
+    turnY++;
   }
   else if(angleY > 260 && angleY < 360 && archiveAngleY > 0 && archiveAngleY < 100) {
-    turnY++;  
+    turnY--;  
   }
   ypos = (360 * turnY) + angleY;
-  archiveAngleY = angleY;
+  if(archiveAngleY != angleY) {
+    archiveAngleY = angleY;
+  }
   Serial.print("Y POS: ");
   Serial.print(turnY);
   Serial.print(", ");
-  Serial.println(angleX);
+  Serial.print(angleY);
+  Serial.print(", ");
+  Serial.println(ypos);
 }
 
 /*inline void degToPos(AMS_AS5048B encoder, int angle, int archiveAngle, int turn, int pos) {
@@ -169,9 +180,9 @@ void circle(float radius, int circlenum) {
     Serial.print(i);
     Serial.print(", ");
     Serial.println((radius * sin(i * (2*PI/circlenum))));
-    float newxpos = 445 - (radius * cos(i * (2*PI/circlenum))); // FIX CENTER
+    float newxpos = 806 - (radius * cos(i * (2*PI/circlenum))); // FIX CENTER
     int newx = round(newxpos);
-    float newypos = 464 - (radius * sin(i * (2*PI/circlenum))); // FIX CENTER
+    float newypos = 827 - (radius * sin(i * (2*PI/circlenum))); // FIX CENTER
     int newy = round(newypos);
     moveX(newx);
     moveY(newy);
@@ -182,10 +193,54 @@ void circle(float radius, int circlenum) {
 void loop() {
   // put your main code here, to run repeatedly:
   if(Serial.available() > 0) {
-    zero();
-      
-    moveX(370);
-    moveY(370);
+    while(Serial.read() != 'g') {
+      receivedChar = Serial.read();
+    }
+
+    ///////////////////////////////////////
+
+    int xSwitch = digitalRead(endStopX);
+    int ySwitch = digitalRead(endStopY);
+    while(xSwitch == HIGH || ySwitch == HIGH) { // FIX: CHECK IF LOW OR HIGH
+      if(xSwitch == HIGH) {
+        stepperX.step(1, BACKWARD, MICROSTEP);      
+      }
+      if(ySwitch == HIGH) {
+        stepperY.step(1, FORWARD, MICROSTEP);
+      }
+      xSwitch = digitalRead(endStopX);
+      ySwitch = digitalRead(endStopY);
+    }
+    
+    encoderX.setZeroReg();
+    encoderY.setZeroReg();
+    
+    xpos = encoderX.angleR(U_DEG);
+    ypos = encoderY.angleR(U_DEG);
+    if(xpos > 300) {
+      turnX--;
+    }
+    if(ypos > 300) {
+      turnY--;
+    }
+
+    /////////////////////////////////////////
+
+    Serial.print("INITIAL POS: ");
+    Serial.print(xpos);
+    Serial.print(", ");
+    Serial.println(ypos);
+    delay(2000);
+    moveX(7);
+    moveY(827);
+    delay(2000);
+    moveX(235);
+    delay(2000);
+    moveX(466);
+    delay(2000);
+    moveX(684);
+    delay(2000);
+    
   
     delay(2000000);
   }

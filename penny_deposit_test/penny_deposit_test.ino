@@ -37,7 +37,7 @@ void setup() {
 
   // Use these functions to set the direction that the encoder reads in
   encoderX.setClockWise(false);
-  encoderY.setClockWise(false);
+  encoderY.setClockWise(true);
 
   stepperX.setSpeed(40);
   stepperY.setSpeed(40);
@@ -112,6 +112,9 @@ void zero() {
   
   encoderX.setZeroReg();
   encoderY.setZeroReg();
+  
+  xpos = encoderX.angleR(U_DEG);
+  ypos = encoderY.angleR(U_DEG);
 }
 
 void readEncoderX() {
@@ -123,27 +126,35 @@ void readEncoderX() {
     turnX--;  
   }
   xpos = (360 * turnX) + angleX;
-  archiveAngleX = angleX;
+  if(archiveAngleX != angleX) {
+    archiveAngleX = angleX;
+  }
   Serial.print("X POS: ");
   Serial.print(turnX);
   Serial.print(", ");
-  Serial.println(angleX);
+  Serial.print(angleX);
+  Serial.print(", ");
+  Serial.println(xpos);
 }
 
 void readEncoderY() {
   angleY = encoderY.angleR(U_DEG);
   if(angleY > 0 && angleY < 100 && archiveAngleY > 260 && archiveAngleY < 360) {
-    turnY--;
+    turnY++;
   }
   else if(angleY > 260 && angleY < 360 && archiveAngleY > 0 && archiveAngleY < 100) {
-    turnY++;  
+    turnY--;  
   }
   ypos = (360 * turnY) + angleY;
-  archiveAngleY = angleY;
+  if(archiveAngleY != angleY) {
+    archiveAngleY = angleY;
+  }
   Serial.print("Y POS: ");
   Serial.print(turnY);
   Serial.print(", ");
-  Serial.println(angleX);
+  Serial.print(angleY);
+  Serial.print(", ");
+  Serial.println(ypos);
 }
 
 /*inline void degToPos(AMS_AS5048B encoder, int angle, int archiveAngle, int turn, int pos) {
@@ -206,6 +217,9 @@ void loop() {
     }
     if(receivedChar == 'h') {
       moveY(ypos - 1);
+    }
+    if(receivedChar == 'z') {
+      zero();
     }
   }
 

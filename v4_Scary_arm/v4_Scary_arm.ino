@@ -12,9 +12,9 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 // have!
 
 
-int servo0Pos;
-int servo1Pos;
-int servo2Pos;
+int servo0Pos = 150;
+int servo1Pos = 150;
+int servo2Pos = 150;
 int MOVEDELAY = 12;
 char receivedChar;
 
@@ -125,6 +125,6 @@ void fineTune() {
 void loop() {
   // put your main code here, to run repeatedly:
   if(Serial.available() > 0) {
-    
+    fineTune();
   }  
 }
