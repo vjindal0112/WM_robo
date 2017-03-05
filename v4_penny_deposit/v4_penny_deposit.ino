@@ -36,7 +36,7 @@ void setup() {
   encoderY.begin();
 
   // Use these functions to set the direction that the encoder reads in
-  encoderX.setClockWise(true);
+  encoderX.setClockWise(false);
   encoderY.setClockWise(true);
 
   stepperX.setSpeed(40);
@@ -49,13 +49,13 @@ void moveX(int xtarget) {
   int xdiff = xtarget - xpos;
   if (xdiff > 0) {
     while (xpos < xtarget) {
-      stepperX.step(1, FORWARD, MICROSTEP); // FIX: CHECK DIRECTION
+      stepperX.step(1, FORWARD, SINGLE); // FIX: CHECK DIRECTION
       readEncoderX();
     }
   } 
   else if (xdiff < 0) {
     while (xpos > xtarget) {
-      stepperX.step(1, BACKWARD, MICROSTEP); // FIX: CHECK DIRECTION
+      stepperX.step(1, BACKWARD, SINGLE); // FIX: CHECK DIRECTION
       readEncoderX();
     }
   }
@@ -66,13 +66,13 @@ void moveY(int ytarget) {
   int ydiff = ytarget - ypos;
   if (ydiff > 0) {
     while (ypos < ytarget) {
-      stepperY.step(1, BACKWARD, MICROSTEP); // FIX: CHECK DIRECTION
+      stepperY.step(1, BACKWARD, SINGLE); // FIX: CHECK DIRECTION
       readEncoderY();
     }
   } 
   else if (ydiff < 0) {
     while (ypos > ytarget) {
-      stepperY.step(1, FORWARD, MICROSTEP); // FIX: CHECK DIRECTION
+      stepperY.step(1, FORWARD, SINGLE); // FIX: CHECK DIRECTION
       readEncoderY();
     }
   }
@@ -82,14 +82,14 @@ void moveY(int ytarget) {
   int xdiff = xtarget - xpos;
   if (xdiff > 0) {
     while (xpos < xtarget) {
-      stepperX.step(1, FORWARD, MICROSTEP);
+      stepperX.step(1, FORWARD, SINGLE);
       readEncoderX();
     }
   } 
   else if (xdiff < 0) {
     xdir = BACKWARD;
     while (xpos > xtarget) {
-      stepperX.step(1, BACKWARD, MICROSTEP);
+      stepperX.step(1, BACKWARD, SINGLE);
       readEncoderX();
     }
   }
@@ -101,10 +101,10 @@ void zero() {
   int ySwitch = digitalRead(endStopY);
   while(xSwitch == HIGH || ySwitch == HIGH) { // FIX: CHECK IF LOW OR HIGH
     if(xSwitch == HIGH) {
-      stepperX.step(1, BACKWARD, MICROSTEP);      
+      stepperX.step(1, BACKWARD, SINGLE);      
     }
     if(ySwitch == HIGH) {
-      stepperY.step(1, FORWARD, MICROSTEP);
+      stepperY.step(1, FORWARD, SINGLE);
     }
     xSwitch = digitalRead(endStopX);
     ySwitch = digitalRead(endStopY);
@@ -115,14 +115,22 @@ void zero() {
   
   xpos = encoderX.angleR(U_DEG);
   ypos = encoderY.angleR(U_DEG);
+  int xpos = 0;
+  int ypos = 0;
+  float angleX = 0;
+  float angleY = 0;
+  float archiveAngleX = 0;
+  float archiveAngleY = 0;
+  int turnX = 0;
+  int turnY = 0;
 }
 
 void readEncoderX() {
   angleX = encoderX.angleR(U_DEG);
-  if(angleX > 0 && angleX < 100 && archiveAngleX > 260 && archiveAngleX < 360) {
+  if(angleX >= 0 && angleX < 100 && archiveAngleX > 260 && archiveAngleX < 360) {
     turnX++;
   }
-  else if(angleX > 260 && angleX < 360 && archiveAngleX > 0 && archiveAngleX < 100) {
+  else if(angleX > 260 && angleX < 360 && archiveAngleX >= 0 && archiveAngleX < 100) {
     turnX--;  
   }
   xpos = (360 * turnX) + angleX;
@@ -139,10 +147,10 @@ void readEncoderX() {
 
 void readEncoderY() {
   angleY = encoderY.angleR(U_DEG);
-  if(angleY > 0 && angleY < 100 && archiveAngleY > 260 && archiveAngleY < 360) {
+  if(angleY >= 0 && angleY < 100 && archiveAngleY > 260 && archiveAngleY < 360) {
     turnY++;
   }
-  else if(angleY > 260 && angleY < 360 && archiveAngleY > 0 && archiveAngleY < 100) {
+  else if(angleY > 260 && angleY < 360 && archiveAngleY >= 0 && archiveAngleY < 100) {
     turnY--;  
   }
   ypos = (360 * turnY) + angleY;
@@ -203,10 +211,10 @@ void loop() {
     int ySwitch = digitalRead(endStopY);
     while(xSwitch == HIGH || ySwitch == HIGH) { // FIX: CHECK IF LOW OR HIGH
       if(xSwitch == HIGH) {
-        stepperX.step(1, BACKWARD, MICROSTEP);      
+        stepperX.step(1, BACKWARD, SINGLE);      
       }
       if(ySwitch == HIGH) {
-        stepperY.step(1, FORWARD, MICROSTEP);
+        stepperY.step(1, FORWARD, SINGLE);
       }
       xSwitch = digitalRead(endStopX);
       ySwitch = digitalRead(endStopY);
@@ -215,14 +223,17 @@ void loop() {
     encoderX.setZeroReg();
     encoderY.setZeroReg();
     
-    xpos = encoderX.angleR(U_DEG);
-    ypos = encoderY.angleR(U_DEG);
-    if(xpos > 300) {
-      turnX--;
-    }
-    if(ypos > 300) {
-      turnY--;
-    }
+    angleX = encoderX.angleR(U_DEG);
+    angleY = encoderY.angleR(U_DEG);
+    
+    int xpos = 0;
+    int ypos = 0;
+    float angleX = 0;
+    float angleY = 0;
+    float archiveAngleX = 0;
+    float archiveAngleY = 0;
+    int turnX = 0;
+    int turnY = 0;
 
     /////////////////////////////////////////
 
@@ -232,14 +243,14 @@ void loop() {
     Serial.println(ypos);
     delay(2000);
     moveX(7);
-    moveY(827);
-    delay(2000);
+    moveY(826);
+    circle(799, 22);
     moveX(235);
-    delay(2000);
+    circle(571, 16);
     moveX(466);
-    delay(2000);
+    circle(340, 9);
     moveX(684);
-    delay(2000);
+    circle(122, 3);
     
   
     delay(2000000);
