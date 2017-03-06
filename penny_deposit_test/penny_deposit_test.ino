@@ -23,6 +23,7 @@ float archiveAngleY = 0;
 int turnX = 0;
 int turnY = 0;
 char receivedChar;
+int totalCircles = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -39,8 +40,8 @@ void setup() {
   encoderX.setClockWise(false);
   encoderY.setClockWise(true);
 
-  stepperX.setSpeed(40);
-  stepperY.setSpeed(40);
+  stepperX.setSpeed(50);
+  stepperY.setSpeed(50);
 
   
 }
@@ -49,13 +50,13 @@ void moveX(int xtarget) {
   int xdiff = xtarget - xpos;
   if (xdiff > 0) {
     while (xpos < xtarget) {
-      stepperX.step(1, FORWARD, MICROSTEP); // FIX: CHECK DIRECTION
+      stepperX.step(1, FORWARD, SINGLE); // FIX: CHECK DIRECTION
       readEncoderX();
     }
   } 
   else if (xdiff < 0) {
     while (xpos > xtarget) {
-      stepperX.step(1, BACKWARD, MICROSTEP); // FIX: CHECK DIRECTION
+      stepperX.step(1, BACKWARD, SINGLE); // FIX: CHECK DIRECTION
       readEncoderX();
     }
   }
@@ -66,13 +67,13 @@ void moveY(int ytarget) {
   int ydiff = ytarget - ypos;
   if (ydiff > 0) {
     while (ypos < ytarget) {
-      stepperY.step(1, BACKWARD, MICROSTEP); // FIX: CHECK DIRECTION
+      stepperY.step(1, BACKWARD, SINGLE); // FIX: CHECK DIRECTION
       readEncoderY();
     }
   } 
   else if (ydiff < 0) {
     while (ypos > ytarget) {
-      stepperY.step(1, FORWARD, MICROSTEP); // FIX: CHECK DIRECTION
+      stepperY.step(1, FORWARD, SINGLE); // FIX: CHECK DIRECTION
       readEncoderY();
     }
   }
@@ -82,14 +83,14 @@ void moveY(int ytarget) {
   int xdiff = xtarget - xpos;
   if (xdiff > 0) {
     while (xpos < xtarget) {
-      stepperX.step(1, FORWARD, MICROSTEP);
+      stepperX.step(1, FORWARD, SINGLE);
       readEncoderX();
     }
   } 
   else if (xdiff < 0) {
     xdir = BACKWARD;
     while (xpos > xtarget) {
-      stepperX.step(1, BACKWARD, MICROSTEP);
+      stepperX.step(1, BACKWARD, SINGLE);
       readEncoderX();
     }
   }
@@ -101,10 +102,10 @@ void zero() {
   int ySwitch = digitalRead(endStopY);
   while(xSwitch == HIGH || ySwitch == HIGH) { // FIX: CHECK IF LOW OR HIGH
     if(xSwitch == HIGH) {
-      stepperX.step(1, BACKWARD, MICROSTEP);      
+      stepperX.step(1, BACKWARD, SINGLE);      
     }
     if(ySwitch == HIGH) {
-      stepperY.step(1, FORWARD, MICROSTEP);
+      stepperY.step(1, FORWARD, SINGLE);
     }
     xSwitch = digitalRead(endStopX);
     ySwitch = digitalRead(endStopY);
@@ -115,14 +116,22 @@ void zero() {
   
   xpos = encoderX.angleR(U_DEG);
   ypos = encoderY.angleR(U_DEG);
+  int xpos = 0;
+  int ypos = 0;
+  float angleX = 0;
+  float angleY = 0;
+  float archiveAngleX = 0;
+  float archiveAngleY = 0;
+  int turnX = 0;
+  int turnY = 0;
 }
 
 void readEncoderX() {
   angleX = encoderX.angleR(U_DEG);
-  if(angleX > 0 && angleX < 100 && archiveAngleX > 260 && archiveAngleX < 360) {
+  if(angleX >= 0 && angleX < 100 && archiveAngleX > 260 && archiveAngleX < 360) {
     turnX++;
   }
-  else if(angleX > 260 && angleX < 360 && archiveAngleX > 0 && archiveAngleX < 100) {
+  else if(angleX > 260 && angleX < 360 && archiveAngleX >= 0 && archiveAngleX < 100) {
     turnX--;  
   }
   xpos = (360 * turnX) + angleX;
@@ -139,10 +148,10 @@ void readEncoderX() {
 
 void readEncoderY() {
   angleY = encoderY.angleR(U_DEG);
-  if(angleY > 0 && angleY < 100 && archiveAngleY > 260 && archiveAngleY < 360) {
+  if(angleY >= 0 && angleY < 100 && archiveAngleY > 260 && archiveAngleY < 360) {
     turnY++;
   }
-  else if(angleY > 260 && angleY < 360 && archiveAngleY > 0 && archiveAngleY < 100) {
+  else if(angleY > 260 && angleY < 360 && archiveAngleY >= 0 && archiveAngleY < 100) {
     turnY--;  
   }
   ypos = (360 * turnY) + angleY;
@@ -168,9 +177,9 @@ void readEncoderY() {
 } */
 
 void circle(float radius, int circlenum) {
-  for(int i = 0; i <= circlenum; i++) {
+  for(int i = 0; i < circlenum; i++) {
     receivedChar = Serial.read();
-    if (i == 10 || i == 20) {
+    if (totalCircles % 10 == 0) {
       while(receivedChar != 'n') {
         receivedChar = Serial.read();
       }
@@ -180,12 +189,13 @@ void circle(float radius, int circlenum) {
     Serial.print(i);
     Serial.print(", ");
     Serial.println((radius * sin(i * (2*PI/circlenum))));
-    float newxpos = 445 - (radius * cos(i * (2*PI/circlenum))); // FIX CENTER
+    float newxpos = 806 - (radius * cos(i * (2*PI/circlenum))); // FIX CENTER
     int newx = round(newxpos);
-    float newypos = 464 - (radius * sin(i * (2*PI/circlenum))); // FIX CENTER
+    float newypos = 827 - (radius * sin(i * (2*PI/circlenum))); // FIX CENTER
     int newy = round(newypos);
     moveX(newx);
     moveY(newy);
+    totalCircles++;
     delay(20);
   } 
 }

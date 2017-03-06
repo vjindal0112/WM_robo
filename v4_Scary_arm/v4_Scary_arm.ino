@@ -28,6 +28,9 @@ void setup() {
   pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
 
   yield();
+  while(Serial.read() != 'g') {
+    
+  }
 }
 
 void moveServos(int pos0, int pos1, int pos2) {
@@ -100,31 +103,49 @@ void fineTune() {
   while(receivedChar != 'g') {
     receivedChar = Serial.read();
     if(receivedChar == 'w') {
-      moveServos(servo0pos + 1, servo1pos, servo2pos);
+      moveServos(servo0Pos + 1, servo1Pos, servo2Pos);
     }
     if(receivedChar == 's') {
-      moveServos(servo0pos - 1, servo1pos, servo2pos);
+      moveServos(servo0Pos - 1, servo1Pos, servo2Pos);
     }
     if(receivedChar == 'r') {
-      moveServos(servo0pos, servo1pos + 1, servo2pos);
+      moveServos(servo0Pos, servo1Pos + 1, servo2Pos);
     }
     if(receivedChar == 'f') {
-      moveServos(servo0pos, servo1pos - 1, servo2pos);
+      moveServos(servo0Pos, servo1Pos - 1, servo2Pos);
     }
     if(receivedChar == 'y') {
-      moveServos(servo0pos, servo1pos, servo2pos + 1);
+      moveServos(servo0Pos, servo1Pos, servo2Pos + 1);
     }
     if(receivedChar == 'h') {
-      moveServos(servo0pos, servo1pos, servo2pos - 1);
+      moveServos(servo0Pos, servo1Pos, servo2Pos - 1);
     }
   }
 }
 
-}
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if(Serial.available() > 0) {
-    fineTune();
-  }  
+//  if(Serial.available() > 0) {
+    Serial.println("INSIDE");
+    receivedChar = Serial.read();
+    if(receivedChar == 'w') {
+      moveServos(servo0Pos + 1, servo1Pos, servo2Pos);
+    }
+    if(receivedChar == 's') {
+      moveServos(servo0Pos - 1, servo1Pos, servo2Pos);
+    }
+    if(receivedChar == 'r') {
+      moveServos(servo0Pos, servo1Pos + 1, servo2Pos);
+    }
+    if(receivedChar == 'f') {
+      moveServos(servo0Pos, servo1Pos - 1, servo2Pos);
+    }
+    if(receivedChar == 'y') {
+      moveServos(servo0Pos, servo1Pos, servo2Pos + 1);
+    }
+    if(receivedChar == 'h') {
+      moveServos(servo0Pos, servo1Pos, servo2Pos - 1);
+    }
+//  }  
 }

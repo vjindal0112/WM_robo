@@ -25,6 +25,6 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  pwm.setPWM(4,0, 150);
+  pwm.setPWM(10,0, 450);
 
 }
