@@ -243,19 +243,18 @@ void loop() {
     Serial.print(angleX);
     Serial.print(", ");
     Serial.println(angleY);
-    delay(2000);
-    moveX(7);
-    moveY(826);
-    circle(803, 22);
-    moveX(235);
-    moveY(828);
-    circle(575, 16);
-    moveX(466);
-    moveY(828);
-    circle(346, 9);
     moveX(684);
     moveY(828);
     circle(126, 3);
+    moveX(466);
+    moveY(828);
+    circle(346, 9);
+    moveX(235);
+    moveY(828);
+    circle(575, 16);
+    moveX(7);
+    moveY(826);
+    circle(803, 22);
     
   
     delay(2000000);
