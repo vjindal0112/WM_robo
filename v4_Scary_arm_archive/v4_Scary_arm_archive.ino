@@ -6,9 +6,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 int servoPosA = 150; // Current servo A position (pulse length)
 int servoPosB = 150; // Current servo B position (pulse length)
 int servoPosC = 150; // Current servo C position (pulse length)
-const int servoDelayA = 3; // Servo A delay variables, in milliseconds
-const int servoDelayB = 3; // Servo B delay variables, in milliseconds
-const int servoDelayC = 3; // Servo C delay variables, in milliseconds
+
 
 int currentLiftPosition = 0;
 
@@ -37,6 +35,25 @@ int potValA = 0;
 int potValB = 0;
 int potValC = 0;
 
+int servoacurrcount = 150;
+int servoatargetcount = 150;
+int servoaswitch = 0;
+long servoatimer = 0;
+
+int servobcurrcount = 150;
+int servobtargetcount = 150;
+int servobswitch = 0;
+long servobtimer = 0;
+
+int servoccurrcount = 150;
+int servoctargetcount = 150;
+int servocswitch = 0;
+long servoctimer = 0;
+
+const int servoadelay = 50; // Servo A delay variables, in milliseconds
+const int servobdelay = 50; // Servo B delay variables, in milliseconds
+const int servocdelay = 50; // Servo C delay variables, in milliseconds
+
 void setup() {
   // Set step mode for lift motor (Full Step Mode)
   digitalWrite(stpmode0, LOW);
@@ -62,12 +79,31 @@ void autoRun() {
   if(checkserial('g')) { return; }
 }
 
+int checkserial(char character) {
+  if(Serial.available()) {
+    serialInputChar = Serial.read();
+    if(serialInputChar = character) {
+      return 0;
+    } else {
+      return 1; 
+    }
+  } else {
+    return 0;
+  }
+}
+
 void loop() {
   if(Serial.available()) {
     controlMode = Serial.read();
     Serial.println(controlMode);
   }
+  
+  moveservoa();
+  moveservob();
+  moveservoc();
+  
   switch(controlMode) {
+    ///////////////////////////////////////////////////////////////
     case 's':         // "Stop" 
       returnToControlMode = 's';
       break;
@@ -77,29 +113,29 @@ void loop() {
       break;
     ///////////////////////////////////////////////////////////////  
     case 'a':         // Joint A CW/CCW (TODO: Determine Direction)
-      moveServos(servoPosA + 1, servoPosB, servoPosC);
+      servoatargetcount++;
       controlMode = returnToControlMode;
       break;
     case 'b':         // Joint A CW/CCW (TODO: Determine Direction)
-      moveServos(servoPosA - 1, servoPosB, servoPosC);
+      servoatargetcount--;
       controlMode = returnToControlMode;
       break;
     /////////////////////////////////////////////////////////////// 
     case 'c':         // Joint B CW/CCW (TODO: Determine Direction)
-      moveServos(servoPosA, servoPosB + 1, servoPosC);
+      servobtargetcount++;
       controlMode = returnToControlMode;
       break;
     case 'd':         // Joint B CW/CCW (TODO: Determine Direction)
-      moveServos(servoPosA, servoPosB -1, servoPosC);
+      servobtargetcount--;
       controlMode = returnToControlMode;
       break;
     /////////////////////////////////////////////////////////////// 
     case 'e':         // Joint C CW/CCW (TODO: Determine Direction)
-      moveServos(servoPosA, servoPosB, servoPosC + 1);
+      servoctargetcount++;
       controlMode = returnToControlMode;
       break;
     case 'f':         // Joint C CW/CCW (TODO: Determine Direction)
-      moveServos(servoPosA, servoPosB, servoPosC - 1);
+      servoctargetcount--;
       controlMode = returnToControlMode;
       break;
     /////////////////////////////////////////////////////////////// 
@@ -139,16 +175,9 @@ void loop() {
       break;
     /////////////////////////////////////////////////////////////// 
     case 'o':         // Potentiometer Arm Control
-      potValA = map(analogRead(potPinA), 470, 120, 100, 650);
-      potValB = map(analogRead(potPinB), 470, 120, 100, 650);
-      potValC = map(analogRead(potPinC), 120, 470, 100, 650);
-      moveServos(potValA, potValB, potValC);
-      //Serial.print("Pots: ");
-      //Serial.print(potValA);
-      //Serial.print(", ");
-      //Serial.print(potValB);
-      //Serial.print(", ");
-      //Serial.println(potValC);
+      servoatargetcount = map(analogRead(potPinA), 470, 120, 100, 650);
+      servobtargetcount = map(analogRead(potPinB), 470, 120, 100, 650);
+      servoctargetcount = map(analogRead(potPinC), 120, 470, 100, 650); 
       returnToControlMode = 'o';
       break;
     ///////////////////////////////////////////////////////////////
@@ -164,69 +193,90 @@ void loop() {
       lift(0);
       controlMode = returnToControlMode;
       break;
+    ////////////////////////////////////////////////////////////////
   } 
 }
 
 void lift(int targetDeg) {
   int dir;
-  if(currentLiftPosition < targetDeg) {
-    digitalWrite(stepperDirectionC, 0);
+  if(currentLiftPosition > targetDeg) { 
+    digitalWrite(stepperDirectionC, 0); 
   }
-  else if(currentLiftPosition > targetDeg) {
-    digitalWrite(stepperDirectionC, 1);
+  else if(currentLiftPosition < targetDeg) { 
+    digitalWrite(stepperDirectionC, 1); 
   }
+  currentLiftPosition = targetDeg;
   
   int stepStat = 0;
-  for(int i = map(targetDeg, 0, 90, 0, 2500); i > 0; i--) {
+  for(int i = map(targetDeg, 0, 90, 0, 3100); i > 0; i--) {
     digitalWrite(stepperStepC, stepStat);
     delayMicroseconds(750);
-    if(stepStat == 0) {
-      stepStat = 1;
-    } else {
-      stepStat = 0;
+    if(stepStat == 0) { 
+      stepStat = 1; 
+    } 
+    else { 
+      stepStat = 0; 
     }
   }
 }
 
-void moveServos(int posA, int posB, int posC) {
-  int servoDirA;
-  int servoDirB;
-  int servoDirC; 
-  /////////////////////////////////////////////////////////////// 
-  if(servoPosA < posA) {
-    servoDirA = 1;
-  } else {
-    servoDirA = -1;
+void moveservoa() {
+  switch (servoaswitch) {
+    case 0:
+      if(servoatargetcount != servoacurrcount) {
+        servoaswitch = 1;
+        servoatimer = micros();
+      }
+      break;
+    case 1:
+      if(micros() >= (servoatimer + servoadelay)) {
+        if(servoacurrcount > servoatargetcount) { servoacurrcount--; }
+        else if(servoacurrcount < servoatargetcount) { servoacurrcount++; }
+        else { servoaswitch = 0; } 
+        pwm.setPWM(servoChannelA, 0, servoacurrcount);
+        servoatimer = micros();
+      }
+      break;
   }
-  /////////////////////////////////////////////////////////////// 
-  if(servoPosB < posB) {
-    servoDirB = 1;
-  } else {
-    servoDirB = -1;
+}
+
+void moveservob() {
+  switch (servobswitch) {
+    case 0:
+      if(servobtargetcount != servobcurrcount) {
+        servobswitch = 1;
+        servobtimer = micros();
+      }
+      break;
+    case 1:
+      if(micros() >= (servobtimer + servobdelay)) {
+        if(servobcurrcount > servobtargetcount) { servobcurrcount--; }
+        else if(servobcurrcount < servobtargetcount) { servobcurrcount++; }
+        else { servobswitch = 0; } 
+        pwm.setPWM(servoChannelB, 0, servobcurrcount);
+        servobtimer = micros();
+      }
+      break;
   }
-  /////////////////////////////////////////////////////////////// 
-  if(servoPosC < posC) {
-    servoDirC = 1;
-  } else {
-    servoDirC = -1;
-  }  
-  /////////////////////////////////////////////////////////////// 
-  while(servoPosA != posA) {
-    servoPosA+=servoDirA;
-    pwm.setPWM(servoChannelA, 0, servoPosA);
-    delay(servoDelayA);
-  }
-  /////////////////////////////////////////////////////////////// 
-  while(servoPosB != posB) {
-    servoPosB+=servoDirB;
-    pwm.setPWM(servoChannelB, 0, servoPosB);
-    delay(servoDelayB);
-  }
-  /////////////////////////////////////////////////////////////// 
-  while(servoPosC != posC) {
-    servoPosC+=servoDirC;
-    pwm.setPWM(servoChannelC, 0, servoPosC);
-    delay(servoDelayC);
+}
+
+void moveservoc() {
+  switch (servocswitch) {
+    case 0:
+      if(servoctargetcount != servoccurrcount) {
+        servocswitch = 1;
+        servoctimer = micros();
+      }
+      break;
+    case 1:
+      if(micros() >= (servoctimer + servocdelay)) {
+        if(servoccurrcount > servoctargetcount) { servoccurrcount--; }
+        else if(servoccurrcount < servoctargetcount) { servoccurrcount++; }
+        else { servocswitch = 0; } 
+        pwm.setPWM(servoChannelC, 0, servoccurrcount);
+        servoctimer = micros();
+      }
+      break;
   }
 }
 
@@ -242,16 +292,3 @@ void toPickUpHeight() { pwm.setPWM(servoChannelD, 0, 200); }
 void toCheckHeight() { pwm.setPWM(servoChannelD, 0, 250); }
 void toBeginHeight() { pwm.setPWM(servoChannelD, 0, 380); }
 /////////////////////////////////////////////////////////////// 
-
-int checkserial(char character) {
-  if(Serial.available()) {
-    serialInputChar = Serial.read();
-    if(serialInputChar = character) {
-      return 0;
-    } else {
-      return 1; 
-    }
-  } else {
-    return 0;
-  }
-}

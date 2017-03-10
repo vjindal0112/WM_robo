@@ -53,6 +53,8 @@ void lift(int dir) {
   }
 }
 
+
+
 void moveServos(int pos0, int pos1, int pos2) {
   int dir0;
   int dir1;
