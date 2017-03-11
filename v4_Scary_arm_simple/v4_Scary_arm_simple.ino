@@ -27,7 +27,7 @@ const int stpmode2 = 34;
 const int MOVEDELAY = 8;
 
 int servoPos0 = 435; // first joint
-int servoPos1 = 560; // second joint
+int servoPos1 = 555; // second joint
 int servoPos2 = 170; // third joint
 int servoPosWinch = 380; // 
 int servoPosRotate = 350;
@@ -138,7 +138,10 @@ void moveServo2(int pos2) {
 
 void checkEnd() {
   if(Serial.read() == 'p') {
-    lift(1500);
+    lift(1500);   
+    while(true) {
+      
+    }
   }
 }
 
@@ -149,44 +152,70 @@ void loop() {
     toStartHeight();
     clawOpen();
     moveServo0(436);
-    moveServo1(570);
+    moveServo1(575);
     moveServo2(155);
-    delay(3500);
+    delay(3000);
+    lift(4975);
+    while(Serial.read() != 'n') {
+      
+    }
+    lift(0);
+    delay(6000);
     ////////////////////////// INITIALIZATION
     moveServo0(535);
     moveServo1(514);
-    moveServo2(532);
+    moveServo2(531);
     delay(1000);
     rotateCustom(555);
     toCustomHeight(155);
-    delay(5500);
+    delay(6500);
     clawClosed();
     delay(2000);
     toStartHeight();
+    delay(5000);
     ///////////////////////// FIRST PENNY STACK
-    
-
-
+    rotateDrop();
+    moveServo0(360);
+    moveServo1(110);
+    moveServo2(432);
+    delay(1000);
+    toDropHeight();
+    delay(2500);
+    clawOpen();
+    delay(1000);
+    toStartHeight();
+    rotatePickUp();
     //////////////////////// DROP FIRST
     delay(3000);
     moveServo0(370);
     moveServo1(400);
-    moveServo2(278);
+    moveServo2(279);
     delay(1000);
     rotatePickUp();
     clawOpen();
     toCustomHeight(168);
-    delay(5500);
+    delay(6000);
     clawClosed();
-    delay(2000);
+    delay(1000);
     toStartHeight();
-    delay(3000);
-    clawOpen();
+    delay(6000);
     ///////////////////////// SECOND PENNY STACK
+    rotateDrop();
+    moveServo0(360);
+    moveServo1(110);
+    moveServo2(470);
+    delay(1000);
+    toDropHeight();
+    delay(2500);
+    clawOpen();
+    delay(1000);
+    toStartHeight();
+    rotatePickUp();
+    //////////////////////// DROP SECOND
     delay(3000);
     moveServo0(285);
     moveServo1(270);
-    moveServo2(312);
+    moveServo2(303);
     delay(1000);
     rotatePickUp();
     clawOpen();
@@ -195,13 +224,24 @@ void loop() {
     clawClosed();
     delay(2000);
     toStartHeight();
-    delay(3000);
-    clawOpen();
+    delay(6000);
     //////////////////////// THIRD PENNY STACK
+    rotateDrop();
+    moveServo0(295);
+    moveServo1(154);
+    moveServo2(432);
+    delay(1000);
+    toDropHeight();
+    delay(2500);
+    clawOpen();
+    delay(1000);
+    toStartHeight();
+    rotatePickUp();
+    //////////////////////// DROP THIRD
     delay(3000);
     moveServo0(215);
     moveServo1(235);
-    moveServo2(473);
+    moveServo2(476);
     delay(1000);
     rotateCustom(556);
     clawOpen();
@@ -210,11 +250,24 @@ void loop() {
     clawClosed();
     delay(2000);
     toStartHeight();
-    delay(3000);
-    clawOpen();
+    delay(6000);
     checkEnd();
     /////////////////////// FOURTH PENNY STACK
-    delay(3000);
+    rotateDrop();
+    moveServo0(320);
+    moveServo1(150);
+    moveServo2(350);
+    checkEnd();
+    delay(1000);
+    toDropHeight();
+    delay(2500);
+    clawOpen();
+    delay(1000);
+    toStartHeight();
+    rotatePickUp();
+    checkEnd();
+    //////////////////////// DROP FOURTH
+    delay(4000);
     moveServo0(210);
     moveServo1(185);
     moveServo2(190);
@@ -229,14 +282,35 @@ void loop() {
     delay(2000);
     toStartHeight();
     checkEnd();
+    delay(6000); 
     ////////////////////// FIFTH PENNY STACK
-    
+    rotateDrop();
+    moveServo0(235);
+    moveServo1(245);
+    moveServo2(349);
+    checkEnd();
+    delay(1000);
+    toDropHeight();
+    delay(2500);
+    clawOpen();
+    delay(1000);
+    checkEnd();
+    toStartHeight();
+    delay(6000);
+    rotatePickUp();
+    checkEnd(); 
+    //////////////////////// DROP FIFTH
     rotateStart();
     toStartHeight();
     clawOpen();
     moveServo0(436);
     moveServo1(570);
     moveServo2(155);
+    
+    while(Serial.read() != 'g') {
+      
+    }
+    lift(3000);
     delay(2000000);
   }  
 }
