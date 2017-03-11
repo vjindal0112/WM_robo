@@ -24,6 +24,8 @@ int turnX = 0;
 int turnY = 0;
 char receivedChar;
 int totalCircles = 0;
+const int centerX = 800;
+const int centerY = 820;
 
 void setup() {
   Serial.begin(9600);
@@ -189,9 +191,9 @@ void circle(float radius, int circlenum) {
     Serial.print(i);
     Serial.print(", ");
     Serial.println((radius * sin(i * (2*PI/circlenum))));
-    float newxpos = 810 - (radius * cos(i * (2*PI/circlenum))); // FIX CENTER
+    float newxpos = centerX - (radius * cos(i * (2*PI/circlenum))); // FIX CENTER
     int newx = round(newxpos);
-    float newypos = 827 - (radius * sin(i * (2*PI/circlenum))); // FIX CENTER
+    float newypos = centerY - (radius * sin(i * (2*PI/circlenum))); // FIX CENTER
     int newy = round(newypos);
     moveX(newx);
     moveY(newy);
@@ -242,19 +244,19 @@ void loop() {
     Serial.print("INITIAL POS: ");
     Serial.print(angleX);
     Serial.print(", ");
-    Serial.println(angleY);
-    moveX(684);
-    moveY(828);
+    Serial.println(angleY - 2);
+    moveX(centerX - 120);
+    moveY(centerY);
     circle(126, 3);
-    moveX(466);
-    moveY(828);
+    moveX(centerX - 346);
+    moveY(centerY);
     circle(346, 9);
-    moveX(235);
-    moveY(828);
+    moveX(centerX - 578);
+    moveY(centerY + 1);
     circle(575, 16);
-    moveX(7);
-    moveY(826);
-    circle(803, 22);
+    moveX(centerX - 799);
+    moveY(centerY - 1);
+    circle(800, 22);
     
   
     delay(2000000);

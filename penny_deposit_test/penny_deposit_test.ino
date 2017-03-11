@@ -42,6 +42,7 @@ void setup() {
 
   stepperX.setSpeed(50);
   stepperY.setSpeed(50);
+  zero();
 
   
 }
