@@ -11,6 +11,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 // for max range. You'll have to tweak them as necessary to match the servos you
 // have!
 
+
 const int firstJointPin = 0; // Joint A (Master is potPinA)
 const int secondJointPin = 4; // Joint B (Master is potPinB)
 const int thirdJointPin = 1; // Joint C (Master is potPinC)
@@ -155,7 +156,7 @@ void loop() {
     moveServo1(575);
     moveServo2(155);
     delay(3000);
-    lift(4975);
+    lift(4970);
     while(Serial.read() != 'n') {
       
     }
