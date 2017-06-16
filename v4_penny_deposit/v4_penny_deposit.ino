@@ -24,7 +24,7 @@ int turnX = 0;
 int turnY = 0;
 char receivedChar;
 int totalCircles = 0;
-const int centerX = 800;
+const int centerX = 792;
 const int centerY = 820;
 
 void setup() {
@@ -245,7 +245,7 @@ void loop() {
     Serial.print(angleX);
     Serial.print(", ");
     Serial.println(angleY - 2);
-    moveX(centerX - 120);
+    moveX(centerX - 125);
     moveY(centerY);
     circle(126, 3);
     moveX(centerX - 346);
